@@ -4,10 +4,13 @@ const ctx = canvas.getContext('2d');
 const gridSize = 50; // Adjust this value to change the size of the grid
 const cellSize = 10; // Adjust this value to change the size of each cell
 const canvasSize = gridSize * cellSize;
+const interval = setInterval(render, 50);
 
 let pellet = createFood();
 let frame = 0;
 let gameState = true;
+let myDirection = "";
+var scoreCount = 0;
 
 //Initial snake body size
 let snakeBody = [
@@ -19,7 +22,6 @@ let snakeBody = [
 
 canvas.width = canvasSize;
 canvas.height = canvasSize;
-
 
 // Function to draw a single cell
 function drawCell(x, y, fillColor) {
@@ -77,10 +79,9 @@ function tailSwap(x, y) {
         ];
         myDirection = ""
         gameState = false;
+        scoreCount = 0;
     }
 }
-
-
 
 // Function to be executed when a key is pressed
 function handleKeyDown(event) {
@@ -103,52 +104,48 @@ function handleKeyDown(event) {
     }
 }
 
-
-
 function createFood() {
     //select a random location within the grid
     //color a box within this grid
     const randomX = Math.floor(Math.random() * gridSize);
     const randomY = Math.floor(Math.random() * gridSize);
+
+     scoreCount++;
     return { x: randomX, y: randomY };
 }
 
-const interval = setInterval(render, 50);
 
-//store direction
-let myDirection = "";
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //Score function
+    document.getElementById("score").innerHTML = "Pellets Consumed: "+`${scoreCount}`;
     //food pellet
     drawCell(pellet.x, pellet.y, "rgb(109, 96, 28)");
     drawSnakeBody();
     handleKeyDown({ key: myDirection });
+
     if (gameState === false) {
         //You lost information
         ctx.fillStyle = "rgba(200, 200, 80)"; // Set the fill color
-        ctx.rect(canvas.width/2 - 150, canvas.height/2 - 50, 300, 100);
+        ctx.rect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 100);
         ctx.fill()
 
         const text = 'GAME OVER';
         ctx.font = '24px NokiaKokia';
         ctx.fillStyle = 'rgba(109,96,28)';
         const text_width = ctx.measureText(text);
-        ctx.fillText(text,canvas.width/2 - (text_width.width/2), canvas.height/2)
-
-
+        ctx.fillText(text, canvas.width / 2 - (text_width.width / 2), canvas.height / 2)
 
         const text_sub = 'press arrow key';
         ctx.font = '14px NokiaKokia';
         ctx.fillStyle = 'rgba(109,96,28)';
         const text_sub_width = ctx.measureText(text_sub);
-        ctx.fillText(text_sub, canvas.width/2-(text_sub_width.width/2), canvas.height/2 + 24);
+        ctx.fillText(text_sub, canvas.width / 2 - (text_sub_width.width / 2), canvas.height / 2 + 24);
 
 
     }
 }
-
-
 
 // Adding event listener for keydown to the document
 document.addEventListener("keydown", handleKeyDown);
