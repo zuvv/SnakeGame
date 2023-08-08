@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+  
+  canvas {
+    border: 1px solid #333;
+    background-color: rgb(190, 190, 70);
+  }
+  
+  
+  @font-face {
+    font-family: 'NokiaKokia'; /* Font name you want to use */
+    src: url('NokiaKokia.ttf') format('truetype'); /* Path to your TTF font file */
+  }
+  
