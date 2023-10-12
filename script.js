@@ -1,23 +1,27 @@
 const canvas = document.getElementById('gridCanvas');
 const ctx = canvas.getContext('2d');
 
-const gridSize = 50; // Adjust this value to change the size of the grid
-const cellSize = 10; // Adjust this value to change the size of each cell
+const gridSize = 20; // Adjust this value to change the size of the grid
+const cellSize = 30; // Adjust this value to change the size of each cell
 const canvasSize = gridSize * cellSize;
-const interval = setInterval(render, 50);
+const interval = setInterval(render, 120);
 
 let pellet = createFood();
 let frame = 0;
 let gameState = true;
 let myDirection = "";
 var scoreCount = 0;
+let gamestart = true;
 
 //Initial snake body size
 let snakeBody = [
+    { x: 10, y: 10 },
+    /*
     { x: 25, y: 25 },
     { x: 25, y: 24 },
     { x: 25, y: 23 },
     { x: 25, y: 22 }
+    */
 ];
 
 canvas.width = canvasSize;
@@ -29,10 +33,10 @@ function drawCell(x, y, fillColor) {
     ctx.fillStyle = fillColor; // Set the fill color
     ctx.rect(x * cellSize, y * cellSize, cellSize, cellSize);
     ctx.fill()
-    /*
+    
     ctx.strokeStyle = '#000';
     ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
-    */
+    
 }
 
 //Drawing the snake
@@ -43,7 +47,7 @@ function drawSnakeBody() {
 }
 
 
-//swap tail to new location
+//this function moves the tail to the head to move around
 //TODO: Add intercept function into here
 function tailSwap(x, y) {
     gameState = true;
@@ -68,14 +72,17 @@ function tailSwap(x, y) {
         snakeBody.pop();
     }
 
-    //Outside boundaries
+    //Collision of outer boundaries & Reset
     if (x >= (canvas.width / cellSize) || x < 0 || y >= (canvas.height / cellSize) || y < 0) {
-        //reset
+        //reset , starting positions
         snakeBody = [
+            /*
             { x: 25, y: 25 },
             { x: 25, y: 24 },
             { x: 25, y: 23 },
             { x: 25, y: 22 }
+            */
+            { x: 10, y: 10 },
         ];
         myDirection = ""
         gameState = false;
@@ -87,18 +94,22 @@ function tailSwap(x, y) {
 function handleKeyDown(event) {
 
     if (event.key === 'ArrowUp') {
+        gamestart = false;
         myDirection = event.key;
         tailSwap(snakeBody[0].x, (snakeBody[0].y) - 1);
     }
     if (event.key === 'ArrowDown') {
+        gamestart = false;
         myDirection = event.key;
         tailSwap(snakeBody[0].x, (snakeBody[0].y) + 1);
     }
     if (event.key === 'ArrowLeft') {
+        gamestart = false;
         myDirection = event.key;
         tailSwap((snakeBody[0].x) - 1, snakeBody[0].y);
     }
     if (event.key === 'ArrowRight') {
+        gamestart = false;
         myDirection = event.key;
         tailSwap((snakeBody[0].x) + 1, snakeBody[0].y);
     }
@@ -114,7 +125,24 @@ function createFood() {
     return { x: randomX, y: randomY };
 }
 
+function startGame() {
+        //start
+        ctx.fillStyle = "rgba(200, 200, 80)"; // Set the fill color
+        ctx.rect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 100);
+        ctx.fill()
 
+        const text = 'test';
+        ctx.font = '24px NokiaKokia';
+        ctx.fillStyle = 'rgba(109,96,28)';
+        const text_width = ctx.measureText(text);
+        ctx.fillText(text, canvas.width / 2 - (text_width.width / 2), canvas.height / 2)
+
+        const text_sub = 'press arrow key';
+        ctx.font = '14px NokiaKokia';
+        ctx.fillStyle = 'rgba(109,96,28)';
+        const text_sub_width = ctx.measureText(text_sub);
+        ctx.fillText(text_sub, canvas.width / 2 - (text_sub_width.width / 2), canvas.height / 2 + 24);
+}
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -124,6 +152,10 @@ function render() {
     drawCell(pellet.x, pellet.y, "rgb(109, 96, 28)");
     drawSnakeBody();
     handleKeyDown({ key: myDirection });
+
+    if(gamestart === true){
+        startGame();
+    }
 
     if (gameState === false) {
         //You lost information
@@ -142,8 +174,6 @@ function render() {
         ctx.fillStyle = 'rgba(109,96,28)';
         const text_sub_width = ctx.measureText(text_sub);
         ctx.fillText(text_sub, canvas.width / 2 - (text_sub_width.width / 2), canvas.height / 2 + 24);
-
-
     }
 }
 
