@@ -42,9 +42,13 @@ body {
     src: url('NokiaKokia.ttf') format('truetype'); /* Path to your TTF font file */
   }
   
-  #score{
+  #score {
     margin-bottom: 10px;
-    width:500px;
+    width: 600px;
+    font-family: 'NokiaKokia', monospace;
+    font-size: 18px;
+    color: rgb(109, 96, 28);
+    letter-spacing: 0.05em;
   }
 
   
