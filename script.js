@@ -17,7 +17,18 @@ let highScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
 let gameOver = false;
 let gameStarted = false;
 
-setInterval(render, 120);
+let lastTick = 0;
+const TICK_MS = 120;
+
+function loop(timestamp) {
+    if (timestamp - lastTick >= TICK_MS) {
+        lastTick = timestamp;
+        tick();
+    }
+    render();
+    requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 
 function randomPos() {
     let pos;
@@ -117,6 +128,11 @@ function drawOverlay(title, sub) {
     ctx.fillText(sub, canvas.width / 2 - sw / 2, canvas.height / 2 + 24);
 }
 
+function tick() {
+    if (!gameStarted || gameOver) return;
+    moveSnake();
+}
+
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -132,10 +148,7 @@ function render() {
 
     if (gameOver) {
         drawOverlay('GAME OVER', 'press arrow key');
-        return;
     }
-
-    moveSnake();
 }
 
 function applyDirection(newDir) {
