@@ -1,6 +1,6 @@
 # Nokia Snake Game
 
-A browser-based Snake game with a Nokia-inspired aesthetic.
+**[Play it here](https://zuvv.github.io/SnakeGame)**
 
 ## How to Play
 
