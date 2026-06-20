@@ -2,7 +2,7 @@ const canvas = document.getElementById('gridCanvas');
 const ctx = canvas.getContext('2d');
 
 const gridSize = 20;
-const cellSize = 30;
+const cellSize = Math.floor(Math.min(window.innerWidth, window.innerHeight, 600) / gridSize);
 const canvasSize = gridSize * cellSize;
 
 canvas.width = canvasSize;
@@ -19,7 +19,7 @@ let gameOver = false;
 let gameStarted = false;
 
 let lastTick = 0;
-const TICK_MS = 120;
+const TICK_MS = 160;
 let skipPrevUpdate = false;
 
 let deathAnimStart = null;

@@ -5,8 +5,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f0f0f0;
+    box-sizing: border-box;
   }
 
   #phone {
@@ -44,11 +45,14 @@ body {
   
   #score {
     margin-bottom: 10px;
-    width: 600px;
+    width: 100%;
+    max-width: 600px;
     font-family: 'NokiaKokia', monospace;
     font-size: 18px;
     color: rgb(109, 96, 28);
     letter-spacing: 0.05em;
+    box-sizing: border-box;
+    padding: 0 4px;
   }
 
   
