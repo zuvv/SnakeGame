@@ -25,6 +25,8 @@ let skipPrevUpdate = false;
 let deathAnimStart = null;
 const DEATH_ANIM_MS = 600;
 
+let scorePopups = [];
+
 function loop(timestamp) {
     if (timestamp - lastTick >= TICK_MS) {
         lastTick = timestamp;
@@ -118,6 +120,7 @@ function resetGame() {
     gameOver = false;
     gameStarted = false;
     deathAnimStart = null;
+    scorePopups = [];
     pellet = randomPos();
 }
 
@@ -159,6 +162,7 @@ function moveSnake() {
     if (newX === pellet.x && newY === pellet.y) {
         scoreCount++;
         pellet = randomPos();
+        scorePopups.push({ x: newX, y: newY, born: performance.now() });
 
     } else {
         snakeBody.pop();
@@ -210,6 +214,21 @@ function render(t = 1, timestamp = 0) {
     const deathElapsed = deathAnimStart ? performance.now() - deathAnimStart : -1;
     const deathFlash = deathElapsed >= 0 && Math.floor(deathElapsed / 80) % 2 === 0;
     drawSnakeBodyInterpolated(t, deathFlash);
+
+    const now = performance.now();
+    scorePopups = scorePopups.filter(p => now - p.born < 600);
+    for (const p of scorePopups) {
+        const age = (now - p.born) / 600;
+        const alpha = 1 - age;
+        const rise = age * cellSize * 2;
+        ctx.globalAlpha = alpha;
+        ctx.font = `bold ${Math.round(cellSize * 0.6)}px NokiaKokia`;
+        ctx.fillStyle = 'rgb(60, 50, 10)';
+        const text = '+1';
+        const tw = ctx.measureText(text).width;
+        ctx.fillText(text, p.x * cellSize + (cellSize - tw) / 2, p.y * cellSize - rise);
+        ctx.globalAlpha = 1;
+    }
 
     if (!gameStarted) {
         drawOverlay('SNAKE', 'press arrow key');
