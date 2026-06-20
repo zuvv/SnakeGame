@@ -13,16 +13,21 @@ let direction = null;
 let nextDirection = null;
 let pellet = randomPos();
 let scoreCount = 0;
+let highScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
 let gameOver = false;
 let gameStarted = false;
 
 setInterval(render, 120);
 
 function randomPos() {
-    return {
-        x: Math.floor(Math.random() * gridSize),
-        y: Math.floor(Math.random() * gridSize)
-    };
+    let pos;
+    do {
+        pos = {
+            x: Math.floor(Math.random() * gridSize),
+            y: Math.floor(Math.random() * gridSize)
+        };
+    } while (snakeBody.some(seg => seg.x === pos.x && seg.y === pos.y));
+    return pos;
 }
 
 function drawCell(x, y, fillColor) {
@@ -35,15 +40,20 @@ function drawCell(x, y, fillColor) {
 }
 
 function drawSnakeBody() {
-    for (const seg of snakeBody) {
-        drawCell(seg.x, seg.y, "rgb(109, 96, 28)");
-    }
+    snakeBody.forEach((seg, i) => {
+        const color = i === 0 ? "rgb(60, 50, 10)" : "rgb(109, 96, 28)";
+        drawCell(seg.x, seg.y, color);
+    });
 }
 
 function resetGame() {
     snakeBody = [{ x: 10, y: 10 }];
     direction = null;
     nextDirection = null;
+    if (scoreCount > highScore) {
+        highScore = scoreCount;
+        localStorage.setItem('snakeHighScore', highScore);
+    }
     scoreCount = 0;
     gameOver = false;
     gameStarted = false;
@@ -110,7 +120,7 @@ function drawOverlay(title, sub) {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    document.getElementById("score").innerHTML = `Score: ${scoreCount}`;
+    document.getElementById("score").innerHTML = `Score: ${scoreCount}   Best: ${highScore}`;
 
     drawCell(pellet.x, pellet.y, "rgb(109, 96, 28)");
     drawSnakeBody();
@@ -128,15 +138,7 @@ function render() {
     moveSnake();
 }
 
-document.addEventListener("keydown", (event) => {
-    const keyMap = {
-        ArrowUp: 'up', ArrowDown: 'down',
-        ArrowLeft: 'left', ArrowRight: 'right'
-    };
-    const newDir = keyMap[event.key];
-    if (!newDir) return;
-
-    // If game over or not started, restart
+function applyDirection(newDir) {
     if (gameOver || !gameStarted) {
         resetGame();
         gameStarted = true;
@@ -144,10 +146,44 @@ document.addEventListener("keydown", (event) => {
         nextDirection = newDir;
         return;
     }
-
-    // Prevent reversing
     const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
     if (newDir !== opposites[direction]) {
         nextDirection = newDir;
     }
+}
+
+document.addEventListener("keydown", (event) => {
+    const keyMap = {
+        ArrowUp: 'up', ArrowDown: 'down',
+        ArrowLeft: 'left', ArrowRight: 'right'
+    };
+    const newDir = keyMap[event.key];
+    if (!newDir) return;
+    event.preventDefault();
+    applyDirection(newDir);
 });
+
+let touchStart = null;
+
+canvas.addEventListener("touchstart", (e) => {
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+    if (!touchStart) return;
+    const dx = e.changedTouches[0].clientX - touchStart.x;
+    const dy = e.changedTouches[0].clientY - touchStart.y;
+    touchStart = null;
+
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+
+    let newDir;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        newDir = dx > 0 ? 'right' : 'left';
+    } else {
+        newDir = dy > 0 ? 'down' : 'up';
+    }
+    applyDirection(newDir);
+    e.preventDefault();
+}, { passive: false });
